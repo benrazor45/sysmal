@@ -1,1 +1,7 @@
 dataset/
+env/
+public_labels.csv
+dataset_feature/
+benign_dataset/
+labels/
+.env
