@@ -1,5 +1,5 @@
 # SysMal: Malware Behavior Analysis with LSTM and CAPEv2
-**SysMal** (Systematic Malware Analysis) is a project that aims to analyze and classify malware based on its dynamic behavior using the Long Short-Term Memory (LSTM) algorithm. The dataset is obtained from the CAPEv2 framework, which records malware runtime activities such as API calls, registry access, and network communication. The project also features a website interface to make it easier for users to upload files and view analysis results in real-time.
+**SysMal** (Systematic Malware Analysis) is a project that aims to analyze and classify malware based on its dynamic behavior using the Long Short-Term Memory (LSTM) algorithm. The dataset is obtained from the CAPEv2 framework, which records malware runtime activities such as API calls. The project also features a website interface to make it easier for users to upload files and view analysis results in real-time.
 
 
 ## 🔍 Key Features
