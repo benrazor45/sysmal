@@ -1,38 +1,54 @@
-import json
 import os
+import json
 import pandas as pd
 
-def extract_summary_features(mal_folder):
-    all_api_calls = []
+def clean_api(api):
+    if '.' in api:
+        return api.split('.')[-1]
+    return api
 
-    for file_name in os.listdir(mal_folder):
-        mal_file = os.path.join(mal_folder, file_name)
+def extract_sequence_from_json(json_path):
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        resolved_apis = data.get('behavior', {}).get('summary', {}).get('resolved_apis', [])
+        if isinstance(resolved_apis, list):
+            cleaned = [clean_api(api) for api in resolved_apis]
 
-        if mal_file.endswith('.json'):
-            try:
-                with open(mal_file, "r") as f:
-                    data = json.load(f)
-                    api_data = data["behavior"]["summary"].get("resolved_apis", [])
-                    # api_data = data["summary"].get("resolved_apis", [])
-                    print(api_data)
+            result = []
+            prev = ''
+            count = 0
+            for api in cleaned:
+                if api == prev:
+                    count += 1
+                else:
+                    count = 1
+                if count <= 2:
+                    result.append(api)
+                prev = api
+            return ' '.join(result)
+        return ''
 
-                    if api_data :
-                        all_api_calls.extend(api_data)
-            except Exception as e:
-                print(f"Error in file {file_name}: {e}")
-    
-    return all_api_calls
+malware_folder = 'dataset'
+# benign_folder = 'json_benign'
+max_files = 8600 #only extract 8600 files, since i have over 48000+ files.
 
-# def save_api_data_mal_to_csv(api_data_list, output_file):
-#     df = pd.DataFrame(api_data_list)
-#     df.insert(0, 'label', 'malware')
-#     df.to_csv(output_file, index=False)
-#     print(f"File save to {output_file}")
 
-extracted = extract_summary_features(mal_folder='dataset')
-def save_api_data_mal_to_txt(api_data_list, output_file):
-    with open(output_file, "w", encoding='utf-8')  as f:
-        f.write(''.join(api_data_list))
+def process_folder(folder, label, max_files):
+    result = []
+    files = [f for f in os.listdir(folder) if f.endswith('.json')]
+    files = files[:max_files] 
 
-# save_api_data_mal_to_csv(extracted, output_file='dataset_feature/api-mal-extracted.csv')
-save_api_data_mal_to_txt(extracted, output_file='dataset_feature/txt/api-mal-extracted.txt')
+    for file_name in files:
+        json_path = os.path.join(folder, file_name)
+        sequence = extract_sequence_from_json(json_path)
+        if sequence: 
+            result.append({'sequence': sequence, 'label': label})
+    return result
+
+
+malware_data = process_folder(malware_folder, 'malware', max_files)
+# benign_data = process_folder(benign_folder, 'benign')
+
+df = pd.DataFrame(malware_data)
+df.to_csv('dataset_feature/sequence/pseudo_sequence_mal_dataset.csv', index=False)
+print("Dataset saved as pseudo_sequence_dataset.csv")
