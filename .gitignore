@@ -5,5 +5,7 @@ dataset_feature/
 benign_dataset/
 labels/
 .env
-tokenizer.pkl
+tokenizer_v2.pkl
+maxlen_v2.txt
 maxlen.txt
+tokenizer.pkl

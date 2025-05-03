@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import AUC
+from tensorflow.keras.layers import Bidirectional
+
 
 X_train = np.load('dataset_feature/tokenization/X_train_v2.npy')
 X_test = np.load('dataset_feature/tokenization/X_test_v2.npy')
@@ -26,8 +28,8 @@ vocab_size = len(tokenizer.word_index) + 1
 
 model = Sequential([
     Embedding(input_dim=vocab_size, output_dim=64, input_length=max_len),
-    LSTM(64, return_sequences=True),
-    LSTM(64),
+    Bidirectional(LSTM(64, return_sequences=True)),
+    Bidirectional(LSTM(64)),
     Dropout(0.3),
     Dense(1, activation='sigmoid')
 ])
