@@ -29,8 +29,11 @@ vocab_size = len(tokenizer.word_index) + 1
 model = Sequential([
     Embedding(input_dim=vocab_size, output_dim=64, input_length=max_len),
     Bidirectional(LSTM(64, return_sequences=True)),
+    Dropout(0.5),
     Bidirectional(LSTM(64)),
-    Dropout(0.3),
+    # LSTM(64, return_sequences=True),
+    # Dropout(0.5),
+    # LSTM(64),
     Dense(1, activation='sigmoid')
 ])
 
@@ -72,5 +75,5 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-model.save('model/lstm_v2_without_auc_v2.h5')
+model.save('/content/drive/MyDrive/dataset-sequences/model/bi_lstm_batch_64.h5')
 print("Model trained and saved.")

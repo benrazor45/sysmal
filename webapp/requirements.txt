@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-requests
-python-multipart
-requests-toolbelt
