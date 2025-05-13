@@ -9,3 +9,5 @@ tokenizer_v2.pkl
 maxlen_v2.txt
 maxlen.txt
 tokenizer.pkl
+model/
+image_results/
