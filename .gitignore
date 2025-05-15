@@ -11,3 +11,6 @@ maxlen.txt
 tokenizer.pkl
 model/
 image_results/
+
+chromedriver-win64/
+.env
