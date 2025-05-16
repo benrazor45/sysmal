@@ -14,3 +14,5 @@ image_results/
 
 chromedriver-win64/
 .env
+mal_link.txt
+ransom_scraping
