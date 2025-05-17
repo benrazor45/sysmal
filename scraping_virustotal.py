@@ -6,6 +6,31 @@ from selenium.webdriver.support import expected_conditions as EC
 from utils import get_chrome_driver
 from hash_mal import hash_groups
 
+
+
+
+def expand_shadow_element(driver, element):
+    """Expand a shadow DOM element."""
+    shadow_root = driver.execute_script('return arguments[0].shadowRoot', element)
+    return shadow_root
+
+def behavior_tab(driver):
+
+    try : 
+        main_shell =  expand_shadow_element(driver, driver.find_element(By.TAG_NAME, 'vt-ui-shell'))
+        file_shell = expand_shadow_element(driver, main_shell.find_element(By.TAG_NAME, 'file-view'))
+        report_shell = expand_shadow_element(file_shell.find_element(By.TAG_NAME, 'vt-ui-main-generic-report'))
+        tab_list = report_shell.find_elements(By.CSS_SELECTOR, 'div > div:nth-child(3) > div > ul > li')
+        if not tab_list or len(tab_list) < 7:
+            print("Tab list not ready")
+            return None
+        
+        behavior_tab = tab_list[6]
+        behavior_tab.click()
+    except Exception as e:
+        print(f"Failed to click behavior tab: {e}")
+        return None
+
 def get_malware_data():
 
     driver = get_chrome_driver()
@@ -20,100 +45,40 @@ def get_malware_data():
 
             driver.get(url)
             time.sleep(10)
+                
+            tab_clicked = 0
 
-            # WebDriverWait(driver, 20).until(lambda d: d.execute_script("""
-            #     return document.querySelector('vt-ui-shell')?.shadowRoot
-            # """) is not null)
-            tab_clicked = False
-            # for _ in range(5): 
-            #     try :
-            #         click_behaviour_tab =  """
-            #         let shell = document.querySelector('vt-ui-shell').shadowRoot;
-            #         let fileView = shell.querySelector('file-view').shadowRoot;
-            #         let report = fileView.querySelector('vt-ui-main-generic-report').shadowRoot;
-            #         let tab = report.querySelectorAll('div > div:nth-child(3) > div > ul > li')[6];
-            #         if (tab) {
-            #             let anchor = tab.querySelector('a');
-            #             if (anchor) {
-            #                 anchor.click();
-            #                 return 'Tab Behavior clicked';
-            #             }
-            #         }
-            #         return 'Behavior tab not found';
-            #         """
-            #         result = driver.execute_script(click_behaviour_tab)
-            #         print(result)
-            #         time.sleep(5)
-            #     except Exception as e:
-            #         print(f"Failed to click bheavior tab {e}")
-            #         continue
-
-            for _ in range(5):  # Coba maksimal 5 kali
-                try:
-                    result = driver.execute_script("""
-                        try {
-                            let shell = document.querySelector('vt-ui-shell')?.shadowRoot;
-                            if (!shell) return 'shell not ready';
-                            let fileView = shell.querySelector('file-view')?.shadowRoot;
-                            if (!fileView) return 'fileView not ready';
-                            let report = fileView.querySelector('vt-ui-main-generic-report#report')?.shadowRoot;
-                            if (!report) return 'report not ready';
-
-                            let tabList = report.querySelectorAll('div > div:nth-child(3) > div > ul > li');
-                            if (!tabList || tabList.length < 7) return 'tab list not ready';
-
-                            let tab = tabList[6];
-                            let anchor = tab?.querySelector('a');
-                            if (!anchor) return 'anchor not found';
-
-                            anchor.click();
-                            return 'clicked';
-                        } catch(e) {
-                            return 'error: ' + e;
-                        }
-                    """)
-                    print("Tab behavior status:", result)
-                    if result == "clicked":
-                        tab_clicked = True
-                        break
-                    else:
-                        time.sleep(2)  # Tunggu dan ulangi
+            for tab_clicked in range(5):
+                try : 
+                    behavior_tab(driver)
+                    time.sleep(5)
+                    continue
+                      # Coba maksimal 5 kali
                 except Exception as e:
-                    print(f"Gagal klik tab Behavior: {e}")
-                    time.sleep(2)
-
-            if not tab_clicked:
-                print(f"Gagal menemukan tab behavior setelah beberapa kali percobaan. Lewati.")
-                continue
-            time.sleep(5) 
-
-            javascript = """
-            return Array.from(
-                document
-                    .querySelector('vt-ui-shell').shadowRoot
-                    .querySelector('file-view').shadowRoot
-                    .querySelector('vt-ui-main-generic-report').shadowRoot
-                    .querySelector('vt-ui-file-behaviours').shadowRoot
-                    .querySelector('vt-ui-behaviour').shadowRoot
-                    .querySelector('highlighted-actions').shadowRoot
-                    .querySelector('vt-ui-expandable').shadowRoot
-                    .querySelector('vt-ui-expandable-entry').shadowRoot
-                    .querySelector('vt-ui-simple-expandable-list').shadowRoot
-                    .querySelectorAll('li')
-            ).map(el => el.textContent.trim());
-            """
-            try:
-                api_calls = driver.execute_script(javascript)
-                print(api_calls)
-                if api_calls :
-                    sequence = " ".join(api_calls)
+                    print(f"Failed to click behavior tab: {e}")
+                    time.sleep(5)
+                    break
+            
+            try :
+                main_shell =  expand_shadow_element(driver, driver.find_element(By.TAG_NAME, 'vt-ui-shell'))
+                file_shell = expand_shadow_element(driver, main_shell.find_element(By.TAG_NAME, 'file-view'))
+                report_shell = expand_shadow_element(file_shell.find_element(By.TAG_NAME, 'vt-ui-main-generic-report'))
+                behavior_shell = expand_shadow_element(report_shell.find_element(By.TAG_NAME, 'vt-ui-file-behaviours'))
+                ui_behaviour_shell = expand_shadow_element(behavior_shell.find_element(By.TAG_NAME, 'vt-ui-behaviour'))
+                highlighted_actions_shell = expand_shadow_element(ui_behaviour_shell.find_element(By.TAG_NAME, 'highlighted-actions'))
+                expandable_shell = expand_shadow_element(highlighted_actions_shell.find_element(By.TAG_NAME, 'vt-ui-expandable'))
+                expandable_entry_shell = expand_shadow_element(expandable_shell.find_element(By.TAG_NAME, 'vt-ui-expandable-entry'))
+                simple_expandable_list_shell = expand_shadow_element(expandable_entry_shell.find_element(By.TAG_NAME, 'vt-ui-simple-expandable-list'))
+                list_items = simple_expandable_list_shell.find_elements(By.TAG_NAME, 'li')
+                if list_items:
+                    print(f"List items found: {len(list_items)}")
+                    sequence = " ".join([item.text for item in list_items])
                     data.append({"sequence": sequence, "label": malware_family})
-                    print(f"API calls found ({len(api_calls)}): {api_calls[:5]}...")
-                else :
-                    print(f"No API calls for {md5}")
+                else: 
+                    print(f"No list items found for {md5}")
             except Exception as e:
-                print(f"[{malware_family}] {i+1}. Failed to take api calls: {e}")
-                api_calls = []
+                print(f"Failed to find elements: {e}")
+                break
 
     driver.quit()
     return data
