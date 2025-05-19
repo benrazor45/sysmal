@@ -16,3 +16,7 @@ chromedriver-win64/
 .env
 mal_link.txt
 ransom_scraping
+_pycache_
+scrape.py
+
+
