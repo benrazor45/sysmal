@@ -304,7 +304,7 @@ if __name__ == "__main__":
         
         if mal_data:
             df = pd.DataFrame(mal_data)
-            output_file = "ransom_scraping/virustotal_sequences.csv"
+            output_file = "ransom_scraping/virustotal_sequences_v3.csv"
             df.to_csv(output_file, index=False)
             print(f"✅ Data saved to {output_file}")
             print(f"📊 Total records: {len(mal_data)}")
