@@ -16,10 +16,14 @@ chromedriver-win64/
 .env
 mal_link.txt
 ransom_scraping
-_pycache_
+__pycache__
 scrape.py
 
 olah_ransom.py
 see_duplicate_scrape.py
+investing/
+scrape_investing.py
+clean_sequence.py
+dataset-virlock/
 
 
